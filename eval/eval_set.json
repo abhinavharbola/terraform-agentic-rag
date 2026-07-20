@@ -1,0 +1,58 @@
+[
+  {
+    "question": "What argument is required to specify which AMI an aws_instance uses?",
+    "ground_truth": "The `ami` argument is required and specifies the AMI to use for the instance.",
+    "retrieved_contexts": [
+      "resource \"aws_instance\" \"web\" {\n  ami           = \"ami-0c55b159cbfafe1f0\"\n  instance_type = \"t3.micro\"\n}\n\nArgument Reference: `ami` (Required) - AMI to use for the instance. `instance_type` (Required) - Instance type to use, such as `t3.micro`."
+    ]
+  },
+  {
+    "question": "How do I enable versioning on an S3 bucket in Terraform?",
+    "ground_truth": "Use a separate aws_s3_bucket_versioning resource referencing the bucket's id, with a versioning_configuration block setting status = \"Enabled\".",
+    "retrieved_contexts": [
+      "resource \"aws_s3_bucket_versioning\" \"data_versioning\" {\n  bucket = aws_s3_bucket.data.id\n  versioning_configuration {\n    status = \"Enabled\"\n  }\n}"
+    ]
+  },
+  {
+    "question": "What's the difference between count and for_each for avoiding unnecessary resource recreation?",
+    "ground_truth": "count indexes resources by position, so removing an item from the middle of a list shifts every subsequent index and can cause Terraform to destroy and recreate resources that didn't actually change. for_each keyed by a stable identifier avoids this because each resource is addressed by its key, not its position.",
+    "retrieved_contexts": [
+      "Using count when for_each would be safer: count indexes resources by position (0, 1, 2...). If you remove an item from the middle of a list, everything after it shifts index and Terraform wants to destroy and recreate resources that didn't actually change. for_each keyed by a stable identifier avoids this entirely."
+    ]
+  },
+  {
+    "question": "How do I pin a provider version in Terraform?",
+    "ground_truth": "Declare the provider inside a required_providers block within the terraform block, setting a source and a version constraint such as \"~> 5.0\".",
+    "retrieved_contexts": [
+      "terraform {\n  required_providers {\n    aws = {\n      source  = \"hashicorp/aws\"\n      version = \"~> 5.0\"\n    }\n  }\n}\n\nrequired_providers (Optional) - A block declaring which providers are required, and their source and version constraints."
+    ]
+  },
+  {
+    "question": "How do I safely destroy just one resource without affecting the rest of my Terraform-managed infrastructure?",
+    "ground_truth": "The recommended approach is to remove the resource block from the configuration file and let a normal terraform apply handle the deletion as part of a full plan, rather than using terraform destroy -target, which is meant as a break-glass tool since it can leave state and config out of sync.",
+    "retrieved_contexts": [
+      "terraform destroy -target=aws_s3_bucket.old_bucket is the quick answer, but be careful, -target is meant as a break-glass tool, not a regular workflow habit... The recommended way for most cases is to remove the resource block from your .tf file entirely and let a normal terraform apply handle the deletion as part of a full plan."
+    ]
+  },
+  {
+    "question": "What does the depends_on argument do on an output block?",
+    "ground_truth": "depends_on on an output block sets explicit dependencies the output should wait on before it is evaluated.",
+    "retrieved_contexts": [
+      "output \"instance_public_ip\" {\n  value       = aws_instance.web.public_ip\n  description = \"The public IP address of the web server.\"\n}\n\nArgument Reference: `value` (Required)... `depends_on` (Optional) - Explicit dependencies the output should wait on."
+    ]
+  },
+  {
+    "question": "How do I set up a remote state backend with locking on AWS?",
+    "ground_truth": "Create an S3 bucket for state and a DynamoDB table for locking (as a one-time bootstrap step outside the main config), then point the terraform backend \"s3\" block at that bucket and table with encrypt = true, and run terraform init -migrate-state to move existing local state into it.",
+    "retrieved_contexts": [
+      "terraform {\n  backend \"s3\" {\n    bucket         = \"my-team-terraform-state\"\n    key            = \"app/terraform.tfstate\"\n    region         = \"us-east-1\"\n    dynamodb_table = \"terraform-lock\"\n    encrypt        = true\n  }\n}\n\nMigrate existing local state: terraform init -migrate-state"
+    ]
+  },
+  {
+    "question": "Why shouldn't I hardcode a database password directly in a Terraform resource block?",
+    "ground_truth": "A hardcoded password gets committed to version control in plaintext. Instead, declare it as a sensitive variable and supply the value at apply time (e.g. from a secrets manager), and ensure the state backend itself encrypts state at rest, since sensitive = true only hides the value from CLI output, not from the state file.",
+    "retrieved_contexts": [
+      "variable \"db_password\" {\n  type      = string\n  sensitive = true\n}\n\nsensitive = true isn't full protection: it hides the value from CLI output, but it's still sitting in your state file in plaintext unless your backend encrypts state at rest."
+    ]
+  }
+]
