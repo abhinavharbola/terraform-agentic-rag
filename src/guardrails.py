@@ -5,11 +5,6 @@ from src.config import settings
 
 logger = logging.getLogger(__name__)
 
-# NVIDIA's own NemoGuard prompt templates (topic-control's TOPIC_SAFETY_OUTPUT_RESTRICTION
-# block, content-safety's unsafe-category policy) are more elaborate than this and are
-# published in the NeMo Guardrails docs / prompts.yml. These are simplified, functionally
-# equivalent versions; swap in NVIDIA's exact templates before relying on this in production,
-# since the models were tuned against their specific phrasing.
 TOPIC_SYSTEM_PROMPT = (
     "You are a topic-control classifier for a Terraform (HashiCorp Infrastructure-as-Code) "
     "documentation assistant. Do not classify a message as on-topic unless it concerns "
@@ -49,10 +44,6 @@ def _classify(model: str, system_prompt: str, message: str) -> str:
 
 def check_topic(standalone_question: str) -> bool:
     verdict = _classify(settings.nemoguard_topic_model, TOPIC_SYSTEM_PROMPT, standalone_question)
-    # check the blocking term first: a narrow classifier given an unfamiliar prompt can
-    # echo fragments of the prompt itself back (e.g. "'on-topic' or 'off-topic'"), which
-    # would satisfy a naive "on-topic" in verdict check even though it's not a real verdict.
-    # any output that isn't clearly "on-topic" fails closed, same polarity as check_safety.
     if "off-topic" in verdict:
         return False
     return "on-topic" in verdict
@@ -77,8 +68,8 @@ def safety_gate(raw_message: str) -> tuple[bool, str | None]:
 
 
 def topic_gate(standalone_question: str) -> tuple[bool, str | None]:
-    """Runs on the history-rewritten standalone question (after safety_gate and
-    rewrite_with_history), so context-dependent follow-ups aren't misjudged as
+    """Runs on the history-rewritten standalone question (after safety_gate 
+    and rewrite_with_history), so context-dependent follow-ups aren't misjudged as
     off-topic. Fails closed on any classifier error."""
     try:
         if not check_topic(standalone_question):

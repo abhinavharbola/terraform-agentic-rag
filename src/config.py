@@ -11,8 +11,8 @@ class Settings(BaseSettings):
     qdrant_api_key: str
     logfire_token: str | None = None
 
-    nim_main_model: str = "openai/gpt-oss-120b"
     groq_main_model: str = "openai/gpt-oss-120b"
+    nim_main_model: str = "openai/gpt-oss-120b"
     nim_planner_model: str = "meta/llama-3.1-8b-instruct"
     groq_planner_model: str = "openai/gpt-oss-20b"
     groq_eval_judge_model: str = "openai/gpt-oss-120b"
@@ -23,13 +23,8 @@ class Settings(BaseSettings):
     gemini_embedding_model: str = "gemini-embedding-001"
     embedding_dim: int = 768
 
-    # empirical, tune against real query pairs. too loose -> unrelated questions
-    # return stale cached answers. too tight -> cache never hits, wastes quota.
     semantic_cache_similarity_threshold: float = 0.95
 
-    # empirical, tune against the corpus. too loose -> noisy chunks reach the
-    # generator and it hallucinates on weak context. too tight -> valid answers
-    # get dropped and the system claims it has no documentation when it does.
     rerank_score_threshold: float = 0.5
 
     qdrant_docs_collection: str = "terraform_docs"
@@ -40,6 +35,5 @@ class Settings(BaseSettings):
 
     rerank_top_k: int = 20
     rerank_model: str = "ms-marco-MiniLM-L-12-v2"
-
 
 settings = Settings()

@@ -6,9 +6,6 @@ from src.config import settings
 
 
 def _normalize(vector: list[float]) -> list[float]:
-    # gemini-embedding-001 does NOT auto-normalize truncated output when
-    # output_dimensionality < 3072 (unlike gemini-embedding-2). required for
-    # cosine similarity in Qdrant to behave correctly at 768 dims.
     array = np.array(vector, dtype=np.float32)
     norm = np.linalg.norm(array)
     if norm == 0:

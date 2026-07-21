@@ -21,10 +21,6 @@ from src.llm import generate_main
 
 
 class GeminiRagasEmbedding(BaseRagasEmbedding):
-    """Thin adapter so RAGAS reuses the same gemini-embedding-001 wrapper
-    (768 dims, normalized) used everywhere else in the project, instead of
-    ragas's built-in GoogleEmbeddings provider with its own defaults."""
-
     def embed_text(self, text: str, **kwargs) -> list[float]:
         return embed_texts([text], task_type="SEMANTIC_SIMILARITY")[0]
 
