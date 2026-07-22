@@ -1,4 +1,3 @@
-Full README, updated:```markdown
 # Terraform Agentic RAG
 
 A retrieval-augmented Q&A system for Terraform (HashiCorp IaC) questions, built to run entirely on a no-GPU, 16GB laptop by offloading every model-weight operation to free-tier hosted APIs. Local compute is limited to parsing, chunking, and CPU/ONNX reranking.
