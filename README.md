@@ -35,6 +35,21 @@ flowchart TD
 
 Implemented as a LangGraph state machine (`src/graph.py`), not a linear script, every node is independently callable and independently testable.
 
+## Tech stack
+
+- **Orchestration:** LangGraph  
+- **LLMs:** NVIDIA NIM (primary), Groq (fallback)  
+- **Guardrails:** NVIDIA NemoGuard (content safety & topic control)  
+- **Embeddings:** Google Gemini (`gemini-embedding-001`)  
+- **Vector database:** Qdrant  
+- **Reranking:** FlashRank (cross-encoder)  
+- **Caching:** SQLite (exact cache), Qdrant (semantic cache)  
+- **Document processing:** BeautifulSoup4, PyMuPDF, python-docx, python-pptx, Markdown parsing, HCL-aware chunking  
+- **Evaluation:** RAGAS  
+- **Tracing & observability:** Logfire  
+- **Frontend:** Streamlit  
+- **Testing:** pytest
+
 ## Provider roles
 
 | Role | Primary | Fallback | Why |
